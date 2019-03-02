@@ -86,3 +86,11 @@ import Data.Semigroup.Bitraversable as Exports
 import Data.Semigroup.Foldable as Exports
 import Data.Semigroup.Traversable as Exports
 import Data.Semigroupoid as Exports
+
+-- mtl
+-------------------------
+import Control.Monad.Cont.Class as Exports hiding (fail)
+import Control.Monad.Error.Class as Exports hiding (Error(..), fail)
+import Control.Monad.Reader.Class as Exports hiding (fail)
+import Control.Monad.State.Class as Exports hiding (fail)
+import Control.Monad.Writer.Class as Exports hiding (fail)
