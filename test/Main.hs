@@ -100,6 +100,12 @@ main =
     ,
     testProperty ">>=" $ forAll ((,) <$> strictAndLazyKleisliGen <*> strictAndLazyListGen) $ \ ((strictK, lazyK), (strict, lazy)) ->
     toList (strict >>= strictK) === (lazy >>= lazyK)
+    ,
+    testProperty "foldl'" $ forAll strictAndLazyListGen $ \ (strict, lazy) ->
+    foldl' (flip (:)) [] strict === foldl' (flip (:)) [] lazy
+    ,
+    testProperty "foldr" $ forAll strictAndLazyListGen $ \ (strict, lazy) ->
+    foldr (:) [] strict === foldr (:) [] lazy
   ]
   where
     lazyListGen = arbitrary @[Word8]
