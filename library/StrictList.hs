@@ -12,6 +12,9 @@ One useful rule of thumb would be that
 whenever you see that a function has a reversed counterpart,
 that counterpart is faster and hence if you don't care about the order or
 intend to reverse the list further down the line, you should give preference to that counterpart.
+
+The typical `toList` and `fromList` conversions are provided by means of
+the `Foldable` and `IsList` instances.
 -}
 module StrictList where
 
