@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude hiding (reverse, toList, List, filter, take, drop, takeWhile, dropWhile, head, last, tail, init)
+import Prelude hiding (choose, reverse, toList, List, filter, take, drop, takeWhile, dropWhile, head, last, tail, init)
 import GHC.Exts as Exports (IsList(..))
 import Test.QuickCheck.Instances
 import Test.Tasty
@@ -106,6 +106,10 @@ main =
     ,
     testProperty "foldr" $ forAll strictAndLazyListGen $ \ (strict, lazy) ->
     foldr (:) [] strict === foldr (:) [] lazy
+    ,
+    testProperty "traverse" $ forAll strictAndLazyListGen $ \ (strict, lazy) -> let
+      fn x = if mod x 2 == 0 then Right x else Left x
+      in fmap toList (traverse fn strict) === traverse fn lazy
   ]
   where
     lazyListGen = arbitrary @[Word8]
@@ -117,11 +121,15 @@ main =
       x <- arbitrary @Word8
       return (op x)
     strictAndLazyKleisliGen = do
-      lazy <- lazyListGen
+      lazy <- sizedListGen 10
       let
-        lazyK = \ x -> join (replicate (fromIntegral x) lazy)
+        lazyK x = fmap (+ x) lazy
         strictK = foldr Cons Nil . lazyK
         in return (strictK, lazyK)
+    sizedListGen maxSize = do
+      length <- choose (0, maxSize)
+      replicateM length (arbitrary @Word8)
+
 
 -- * Workarounds to satisfy QuickCheck's requirements,
 -- when we need to generate a predicate.
