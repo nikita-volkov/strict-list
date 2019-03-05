@@ -32,7 +32,9 @@ instance IsList (List a) where
   toList = foldr (:) []
 
 instance Semigroup (List a) where
-  (<>) = prependReversed . reverse
+  (<>) a b = case b of
+    Nil -> a
+    _ -> prependReversed (reverse a) b
 
 instance Monoid (List a) where
   mempty = Nil
