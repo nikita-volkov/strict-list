@@ -11,7 +11,7 @@ E.g., the <http://hackage.haskell.org/package/deque "deque"> package exploits th
 One useful rule of thumb would be that
 whenever you see that a function has a reversed counterpart,
 that counterpart is faster and hence if you don't care about the order or
-intend to revert the list further down the line, you should give preference to that counterpart.
+intend to reverse the list further down the line, you should give preference to that counterpart.
 -}
 module StrictList where
 
