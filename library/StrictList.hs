@@ -176,12 +176,18 @@ IOW,
 >span predicate list = (takeWhile predicate list, dropWhile predicate list)
 -}
 span :: (a -> Bool) -> List a -> (List a, List a)
-span predicate = let
+span predicate = first reverse . spanReversed predicate
+
+{-|
+Same as `span`, only with the first list in reverse order.
+-}
+spanReversed :: (a -> Bool) -> List a -> (List a, List a)
+spanReversed predicate = let
   buildPrefix !prefix = \ case
     Cons head tail -> if predicate head
       then buildPrefix (Cons head prefix) tail
-      else (reverse prefix, Cons head tail)
-    _ -> (reverse prefix, Nil)
+      else (prefix, Cons head tail)
+    _ -> (prefix, Nil)
   in buildPrefix Nil
 
 {-|
