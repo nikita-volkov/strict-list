@@ -191,6 +191,26 @@ spanReversed predicate = let
   in buildPrefix Nil
 
 {-|
+An opposite version of `span`. I.e.,
+
+>break predicate = span (not . predicate)
+-}
+break :: (a -> Bool) -> List a -> (List a, List a)
+break predicate = first reverse . breakReversed predicate
+
+{-|
+Same as `break`, only with the first list in reverse order.
+-}
+breakReversed :: (a -> Bool) -> List a -> (List a, List a)
+breakReversed predicate = let
+  buildPrefix !prefix = \ case
+    Cons head tail -> if predicate head
+      then (prefix, Cons head tail)
+      else buildPrefix (Cons head prefix) tail
+    _ -> (prefix, Nil)
+  in buildPrefix Nil
+
+{-|
 Same as @(`takeWhile` predicate . `reverse`)@.
 E.g., 
 
