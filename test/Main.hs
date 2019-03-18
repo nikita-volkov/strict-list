@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude hiding (choose, reverse, toList, List, filter, take, drop, takeWhile, dropWhile, head, last, tail, init)
+import Prelude hiding (span, choose, reverse, toList, List, filter, take, drop, takeWhile, dropWhile, head, last, tail, init)
 import GHC.Exts as Exports (IsList(..))
 import Test.QuickCheck.Instances
 import Test.Tasty
@@ -46,6 +46,9 @@ main =
     ,
     testProperty "dropWhile" $ forAll ((,) <$> predicateGen <*> strictAndLazyListGen) $ \ (predicate, (strict, lazy)) ->
     toList (dropWhile predicate strict) === Lazy.dropWhile predicate lazy
+    ,
+    testProperty "span" $ forAll ((,) <$> predicateGen <*> strictAndLazyListGen) $ \ (predicate, (strict, lazy)) ->
+    bimap toList toList (span predicate strict) === Lazy.span predicate lazy
     ,
     testProperty "takeWhileFromEnding" $ forAll ((,) <$> predicateGen <*> strictAndLazyListGen) $ \ (predicate, (strict, lazy)) ->
     toList (takeWhileFromEnding predicate strict) === Lazy.takeWhile predicate (Lazy.reverse lazy)

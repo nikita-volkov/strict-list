@@ -170,6 +170,21 @@ dropWhile predicate = \ case
   Nil -> Nil
 
 {-|
+An optimized version of the same predicate applied to `takeWhile` and `dropWhile`.
+IOW,
+
+>span predicate list = (takeWhile predicate list, dropWhile predicate list)
+-}
+span :: (a -> Bool) -> List a -> (List a, List a)
+span predicate = let
+  buildPrefix !prefix = \ case
+    Cons head tail -> if predicate head
+      then buildPrefix (Cons head prefix) tail
+      else (reverse prefix, Cons head tail)
+    _ -> (reverse prefix, Nil)
+  in buildPrefix Nil
+
+{-|
 Same as @(`takeWhile` predicate . `reverse`)@.
 E.g., 
 
