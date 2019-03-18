@@ -243,6 +243,20 @@ dropWhileFromEnding predicate = let
   in loop Nil Nil
 
 {-|
+Same as @(`span` predicate . `reverse`)@.
+-}
+spanFromEnding :: (a -> Bool) -> List a -> (List a, List a)
+spanFromEnding predicate = let
+  loop !confirmedPrefix !unconfirmedPrefix !suffix = \ case
+    Cons head tail -> if predicate head
+      then loop confirmedPrefix (Cons head unconfirmedPrefix) (Cons head suffix) tail
+      else let
+        !prefix = Cons head unconfirmedPrefix
+        in loop prefix prefix Nil tail
+    Nil -> (suffix, confirmedPrefix)
+  in loop Nil Nil Nil
+
+{-|
 Get the first element and the remainder of the list if it's not empty.
 -}
 uncons :: List a -> Maybe (a, List a)

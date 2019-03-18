@@ -59,6 +59,9 @@ main =
     testProperty "dropWhileFromEnding" $ forAll ((,) <$> predicateGen <*> strictAndLazyListGen) $ \ (predicate, (strict, lazy)) ->
     toList (dropWhileFromEnding predicate strict) === Lazy.dropWhile predicate (Lazy.reverse lazy)
     ,
+    testProperty "spanFromEnding" $ forAll ((,) <$> predicateGen <*> strictAndLazyListGen) $ \ (predicate, (strict, lazy)) ->
+    bimap toList toList (spanFromEnding predicate strict) === Lazy.span predicate (Lazy.reverse lazy)
+    ,
     testProperty "head" $ forAll strictAndLazyListGen $ \ (strict, lazy) ->
     head strict === listToMaybe lazy
     ,
