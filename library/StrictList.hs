@@ -257,6 +257,18 @@ spanFromEnding predicate = let
   in loop Nil Nil Nil
 
 {-|
+Pattern match on list using functions.
+
+Allows to achieve all the same as `uncons` only without intermediate `Maybe`.
+
+Essentially provides the same functionality as `either` for `Either` and `maybe` for `Maybe`.
+-}
+match :: result -> (element -> List element -> result) -> List element -> result
+match nil cons = \ case
+  Cons head tail -> cons head tail
+  Nil -> nil
+
+{-|
 Get the first element and the remainder of the list if it's not empty.
 -}
 uncons :: List a -> Maybe (a, List a)
