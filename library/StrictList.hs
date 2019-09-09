@@ -87,6 +87,8 @@ instance MonadPlus List where
   mzero = empty
   mplus = (<|>)
 
+instance Hashable a => Hashable (List a)
+
 {-|
 Reverse the list.
 -}
