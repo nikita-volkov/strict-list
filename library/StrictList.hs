@@ -89,6 +89,10 @@ instance MonadPlus List where
 
 instance Hashable a => Hashable (List a)
 
+instance NFData a => NFData (List a)
+
+instance NFData1 List
+
 {-|
 Reverse the list.
 -}
