@@ -1,5 +1,5 @@
 name: strict-list
-version: 0.1.5
+version: 0.1.6
 synopsis: Strict linked list
 description:
   Implementation of strict linked list with care taken about stack.
