@@ -96,12 +96,14 @@ instance NFData1 List
 {-|
 Reverse the list.
 -}
+{-# INLINE reverse #-}
 reverse :: List a -> List a
 reverse = foldl' (flip Cons) Nil
 
 {-|
 Leave only the specified amount of elements.
 -}
+{-# INLINE take #-}
 take :: Int -> List a -> List a
 take amount = reverse . takeReversed amount
 
@@ -130,6 +132,7 @@ drop amount = if amount > 0
 {-|
 Leave only the elements satisfying the predicate.
 -}
+{-# INLINE filter #-}
 filter :: (a -> Bool) -> List a -> List a
 filter predicate = reverse . filterReversed predicate
 
@@ -149,6 +152,7 @@ filterReversed predicate = let
 {-|
 Leave only the first elements satisfying the predicate.
 -}
+{-# INLINE takeWhile #-}
 takeWhile :: (a -> Bool) -> List a -> List a
 takeWhile predicate = reverse . takeWhileReversed predicate
 
@@ -181,6 +185,7 @@ IOW,
 
 >span predicate list = (takeWhile predicate list, dropWhile predicate list)
 -}
+{-# INLINE span #-}
 span :: (a -> Bool) -> List a -> (List a, List a)
 span predicate = first reverse . spanReversed predicate
 
@@ -201,6 +206,7 @@ An opposite version of `span`. I.e.,
 
 >break predicate = span (not . predicate)
 -}
+{-# INLINE break #-}
 break :: (a -> Bool) -> List a -> (List a, List a)
 break predicate = first reverse . breakReversed predicate
 
@@ -223,6 +229,7 @@ E.g.,
 >>> takeWhileFromEnding (> 2) (fromList [1,4,2,3,4,5])
 fromList [5,4,3]
 -}
+{-# INLINE takeWhileFromEnding #-}
 takeWhileFromEnding :: (a -> Bool) -> List a -> List a
 takeWhileFromEnding predicate = foldl'
   (\ newList a -> if predicate a
@@ -269,6 +276,7 @@ Allows to achieve all the same as `uncons` only without intermediate `Maybe`.
 
 Essentially provides the same functionality as `either` for `Either` and `maybe` for `Maybe`.
 -}
+{-# INLINE match #-}
 match :: result -> (element -> List element -> result) -> List element -> result
 match nil cons = \ case
   Cons head tail -> cons head tail
@@ -277,6 +285,7 @@ match nil cons = \ case
 {-|
 Get the first element and the remainder of the list if it's not empty.
 -}
+{-# INLINE uncons #-}
 uncons :: List a -> Maybe (a, List a)
 uncons = \ case
   Cons head tail -> Just (head, tail)
@@ -285,6 +294,7 @@ uncons = \ case
 {-|
 Get the first element, if list is not empty.
 -}
+{-# INLINE head #-}
 head :: List a -> Maybe a
 head = \ case
   Cons head _ -> Just head
@@ -293,6 +303,7 @@ head = \ case
 {-|
 Get the last element, if list is not empty.
 -}
+{-# INLINE last #-}
 last :: List a -> Maybe a
 last = let
   loop !previous = \ case
@@ -303,6 +314,7 @@ last = let
 {-|
 Get all elements of the list but the first one.
 -}
+{-# INLINE tail #-}
 tail :: List a -> List a
 tail = \ case
   Cons _ tail -> tail
@@ -311,6 +323,7 @@ tail = \ case
 {-|
 Get all elements but the last one.
 -}
+{-# INLINE init #-}
 init :: List a -> List a
 init = reverse . initReversed
 
@@ -327,6 +340,7 @@ initReversed = let
 {-|
 Apply the functions in the left list to elements in the right one.
 -}
+{-# INLINE apZipping #-}
 apZipping :: List (a -> b) -> List a -> List b
 apZipping left right = apZippingReversed (reverse left) (reverse right)
 
@@ -350,6 +364,7 @@ apZippingReversed = let
 {-|
 Construct from a lazy list in reversed order.
 -}
+{-# INLINE fromListReversed #-}
 fromListReversed :: [a] -> List a
 fromListReversed = foldl' (flip Cons) Nil
 
@@ -357,6 +372,7 @@ fromListReversed = foldl' (flip Cons) Nil
 Add elements of the left list in reverse order
 in the beginning of the right list.
  -}
+{-# INLINE prependReversed #-}
 prependReversed :: List a -> List a -> List a
 prependReversed = \ case
   Cons head tail -> prependReversed tail . Cons head
@@ -376,6 +392,7 @@ mapReversed f = let
 Apply the functions in the left list to every element in the right one,
 producing a list of results in reversed order.
 -}
+{-# INLINE apReversed #-}
 apReversed :: List (a -> b) -> List a -> List b
 apReversed fList aList = foldl' (\ z f -> foldl' (\ z a -> Cons (f a) z) z aList) Nil fList
 
@@ -383,11 +400,13 @@ apReversed fList aList = foldl' (\ z f -> foldl' (\ z a -> Cons (f a) z) z aList
 Use a function to produce a list of lists and then concat them sequentially,
 producing the results in reversed order.
 -}
+{-# INLINE explodeReversed #-}
 explodeReversed :: (a -> List b) -> List a -> List b
 explodeReversed amb = foldl' (\ z -> foldl' (flip Cons) z . amb) Nil
 
 {-|
 Join (concat) producing results in reversed order.
 -}
+{-# INLINE joinReversed #-}
 joinReversed :: List (List a) -> List a
 joinReversed = foldl' (foldl' (flip Cons)) Nil
