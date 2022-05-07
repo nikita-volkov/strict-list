@@ -93,6 +93,15 @@ instance NFData a => NFData (List a)
 instance NFData1 List
 
 -- |
+-- Convert to lazy list in normal form (with all elements and spine evaluated).
+toListReversed :: List a -> [a]
+toListReversed = go []
+  where
+    go !outputList = \case
+      Cons element list -> go (element : outputList) list
+      Nil -> outputList
+
+-- |
 -- Reverse the list.
 {-# INLINE reverse #-}
 reverse :: List a -> List a
@@ -390,3 +399,26 @@ explodeReversed amb = foldl' (\z -> foldl' (flip Cons) z . amb) Nil
 {-# INLINE joinReversed #-}
 joinReversed :: List (List a) -> List a
 joinReversed = foldl' (foldl' (flip Cons)) Nil
+
+-- |
+-- Map and filter elements producing results in reversed order.
+{-# INLINE mapMaybeReversed #-}
+mapMaybeReversed :: (a -> Maybe b) -> List a -> List b
+mapMaybeReversed f = go Nil
+  where
+    go !outputList = \case
+      Cons inputElement inputTail -> case f inputElement of
+        Just outputElement -> go (Cons outputElement outputList) inputTail
+        Nothing -> go outputList inputTail
+      Nil -> outputList
+
+-- |
+-- Keep only the present values, reversing the order.
+catMaybesReversed :: List (Maybe a) -> List a
+catMaybesReversed = go Nil
+  where
+    go !outputList = \case
+      Cons inputElement inputTail -> case inputElement of
+        Just outputElement -> go (Cons outputElement outputList) inputTail
+        Nothing -> go outputList inputTail
+      Nil -> outputList

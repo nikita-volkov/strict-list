@@ -1,6 +1,7 @@
 module Main where
 
 import qualified Data.List as Lazy
+import qualified Data.Maybe as Maybe
 import GHC.Exts as Exports (IsList (..))
 import StrictList
 import qualified Test.QuickCheck as QuickCheck
@@ -117,7 +118,18 @@ main =
         testProperty "traverse" $
           forAll strictAndLazyListGen $ \(strict, lazy) ->
             let fn x = if mod x 2 == 0 then Right x else Left x
-             in fmap toList (traverse fn strict) === traverse fn lazy
+             in fmap toList (traverse fn strict) === traverse fn lazy,
+        testProperty "toListReversed" $
+          forAll strictAndLazyListGen $ \(strict, lazy) ->
+            lazy === toListReversed (reverse strict),
+        testProperty "mapMaybeReversed" $
+          forAll strictAndLazyListGen $ \(strict, lazy) ->
+            let mapper x = if mod x 2 == 0 then Just x else Nothing
+             in Maybe.mapMaybe mapper lazy
+                  === toListReversed (mapMaybeReversed mapper strict),
+        testProperty "catMaybesReversed" $ \(lazy :: [Maybe Word8]) ->
+          Maybe.catMaybes lazy
+            === toListReversed (catMaybesReversed (fromList lazy))
       ]
   where
     lazyListGen = arbitrary @[Word8]
