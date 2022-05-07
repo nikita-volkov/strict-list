@@ -1,3 +1,5 @@
+cabal-version: 3.0
+
 name: strict-list
 version: 0.1.6
 synopsis: Strict linked list
@@ -10,17 +12,18 @@ maintainer: Nikita Volkov <nikita.y.volkov@mail.ru>
 copyright: (c) 2019, Nikita Volkov
 license: MIT
 license-file: LICENSE
-build-type: Simple
-cabal-version: >=1.10
 
 source-repository head
   type: git
   location: git://github.com/nikita-volkov/strict-list.git
 
-library
-  hs-source-dirs: library
+common language-settings
   default-extensions: BangPatterns, DeriveDataTypeable, DeriveGeneric, DeriveFunctor, DeriveTraversable, FlexibleContexts, FlexibleInstances, LambdaCase, NoImplicitPrelude, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies
   default-language: Haskell2010
+
+library
+  import: language-settings
+  hs-source-dirs: library
   exposed-modules:
     StrictList
   other-modules:
@@ -29,7 +32,7 @@ library
     base >=4.9 && <5,
     deepseq >=1.4.3 && <1.5,
     hashable >=1.2 && <2,
-    semigroupoids >=5.3 && <6
+    semigroupoids >=5.3 && <6,
 
 test-suite test
   type: exitcode-stdio-1.0
@@ -44,4 +47,4 @@ test-suite test
     rerebase <2,
     tasty >=0.12 && <2,
     tasty-hunit >=0.9 && <0.11,
-    tasty-quickcheck >=0.9 && <0.11
+    tasty-quickcheck >=0.9 && <0.11,
