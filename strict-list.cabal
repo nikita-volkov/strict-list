@@ -45,7 +45,7 @@ library
     , base >=4.9 && <5
     , deepseq >=1.4.3 && <1.5
     , hashable >=1.2 && <2
-    , semigroupoids >=5.3 && <6
+    , semigroupoids >=5.3 && <7
 
 test-suite test
   type:               exitcode-stdio-1.0
