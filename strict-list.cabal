@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          strict-list
-version:       0.1.7
+version:       0.1.7.1
 synopsis:      Strict linked list
 description:
   Implementation of strict linked list with care taken about stack.
@@ -45,7 +45,7 @@ library
     , base >=4.9 && <5
     , deepseq >=1.4.3 && <1.5
     , hashable >=1.2 && <2
-    , semigroupoids >=5.3 && <6
+    , semigroupoids >=5.3 && <7
 
 test-suite test
   type:               exitcode-stdio-1.0
