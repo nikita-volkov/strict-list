@@ -86,9 +86,9 @@ instance MonadPlus List where
   mzero = empty
   mplus = (<|>)
 
-instance Hashable a => Hashable (List a)
+instance (Hashable a) => Hashable (List a)
 
-instance NFData a => NFData (List a)
+instance (NFData a) => NFData (List a)
 
 instance NFData1 List
 
