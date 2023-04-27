@@ -1,18 +1,15 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
 
 import qualified Data.List as Lazy
 import qualified Data.Maybe as Maybe
 import GHC.Exts as Exports (IsList (..))
 import StrictList
-import qualified Test.QuickCheck as QuickCheck
-import Test.QuickCheck.Instances
-import qualified Test.QuickCheck.Property as QuickCheck
 import Test.Tasty
-import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
-import Test.Tasty.Runners
 import Prelude hiding (List, break, choose, drop, dropWhile, filter, head, init, last, reverse, span, tail, take, takeWhile, toList)
 
+main :: IO ()
 main =
   defaultMain $
     testGroup "" $

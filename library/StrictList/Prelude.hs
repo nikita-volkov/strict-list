@@ -28,7 +28,6 @@ import Data.Foldable as Exports hiding (toList)
 import Data.Function as Exports hiding (id, (.))
 import Data.Functor as Exports
 import Data.Functor.Alt as Exports hiding (many, optional, some, ($>))
-import Data.Functor.Apply as Exports hiding (($>))
 import Data.Functor.Bind as Exports hiding (($>))
 import Data.Functor.Extend as Exports
 import Data.Functor.Identity as Exports
@@ -74,8 +73,6 @@ import System.IO.Unsafe as Exports
 import System.Mem as Exports
 import System.Mem.StableName as Exports
 import System.Timeout as Exports
-import Text.ParserCombinators.ReadP as Exports (ReadP, ReadS, readP_to_S, readS_to_P)
-import Text.ParserCombinators.ReadPrec as Exports (ReadPrec, readP_to_Prec, readPrec_to_P, readPrec_to_S, readS_to_Prec)
 import Text.Printf as Exports (hPrintf, printf)
 import Text.Read as Exports (Read (..), readEither, readMaybe)
 import Unsafe.Coerce as Exports
