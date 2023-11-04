@@ -1,10 +1,11 @@
 cabal-version: 3.0
 name:          strict-list
-version:       0.1.7.2
+version:       0.1.7.3
 synopsis:      Strict linked list
 description:
   Implementation of strict linked list with care taken about stack.
 
+category:      Data
 homepage:      https://github.com/nikita-volkov/strict-list
 bug-reports:   https://github.com/nikita-volkov/strict-list/issues
 author:        Nikita Volkov <nikita.y.volkov@mail.ru>
@@ -43,7 +44,7 @@ library
   other-modules:   StrictList.Prelude
   build-depends:
     , base >=4.9 && <5
-    , deepseq >=1.4.3 && <1.5
+    , deepseq >=1.4.3 && <2
     , hashable >=1.2 && <2
     , semigroupoids >=5.3 && <7
 
