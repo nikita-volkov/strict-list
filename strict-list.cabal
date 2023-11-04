@@ -5,7 +5,7 @@ synopsis:      Strict linked list
 description:
   Implementation of strict linked list with care taken about stack.
 
-category: Data
+category:      Data
 homepage:      https://github.com/nikita-volkov/strict-list
 bug-reports:   https://github.com/nikita-volkov/strict-list/issues
 author:        Nikita Volkov <nikita.y.volkov@mail.ru>
