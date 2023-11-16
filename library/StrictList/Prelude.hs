@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module StrictList.Prelude
   ( module Exports,
   )
@@ -36,7 +38,11 @@ import Data.Hashable as Exports (Hashable)
 import Data.IORef as Exports
 import Data.Int as Exports
 import Data.Ix as Exports
+#if MIN_VERSION_base(4,20,0)
 import Data.List as Exports hiding (all, and, any, concat, concatMap, elem, find, foldl, foldl', foldl1, foldr, foldr1, isSubsequenceOf, mapAccumL, mapAccumR, maximum, maximumBy, minimum, minimumBy, notElem, or, product, sortOn, sum, uncons, unzip)
+#else
+import Data.List as Exports hiding (List, all, and, any, concat, concatMap, elem, find, foldl, foldl', foldl1, foldr, foldr1, isSubsequenceOf, mapAccumL, mapAccumR, maximum, maximumBy, minimum, minimumBy, notElem, or, product, sortOn, sum, uncons, unzip)
+#endif
 import Data.Maybe as Exports
 import Data.Monoid as Exports hiding (Alt, First (..), Last (..), (<>))
 import Data.Ord as Exports
