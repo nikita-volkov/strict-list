@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+
 module StrictList.Prelude
   ( module Exports,
   )
