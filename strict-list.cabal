@@ -72,4 +72,4 @@ test-suite test
     rerebase <2,
     strict-list,
     tasty >=0.12 && <2,
-    tasty-quickcheck >=0.9 && <0.11,
+    tasty-quickcheck >=0.9 && <0.12,
