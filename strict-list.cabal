@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: strict-list
-version: 0.1.7.5
+version: 0.1.7.6
 synopsis: Strict linked list
 description:
   Implementation of strict linked list with care taken about stack.
