@@ -21,7 +21,11 @@ main =
         testProperty "fromList"
           $ forAll lazyListGen
           $ \lazy ->
-            toList (fromList @(List Word8) lazy) === lazy,
+            toList (fromList @(StrictList Word8) lazy) === lazy,
+        testProperty "compare"
+          $ forAll ((,) <$> strictAndLazyListGen <*> strictAndLazyListGen)
+          $ \((strict1, lazy1), (strict2, lazy2)) ->
+            compare strict1 strict2 === compare lazy1 lazy2,
         testProperty "reverse"
           $ forAll strictAndLazyListGen
           $ \(strict, lazy) ->
@@ -183,14 +187,18 @@ main =
       length <- choose (0, maxSize)
       replicateM length (arbitrary @Word8)
 
+instance (Arbitrary a) => Arbitrary (StrictList a) where
+  arbitrary = fromList <$> arbitrary
+  shrink = map fromList . shrink . toList
+
 -- Workarounds to satisfy QuickCheck's requirements,
 -- when we need to generate a predicate.
 
 instance Show (Word8 -> Bool) where
   show _ = "(Word8 -> Bool) function"
 
-instance Show (Word8 -> List Word8) where
-  show _ = "(Word8 -> List Word8) function"
+instance Show (Word8 -> StrictList Word8) where
+  show _ = "(Word8 -> StrictList Word8) function"
 
 instance Show (Word8 -> [Word8]) where
   show _ = "(Word8 -> [Word8]) function"

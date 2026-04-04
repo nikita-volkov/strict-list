@@ -12,37 +12,91 @@
 -- whenever you see that a function has a reversed counterpart,
 -- that counterpart is faster and hence if you don't care about the order or
 -- intend to reverse the list further down the line, you should give preference to that counterpart.
---
--- The typical `toList` and `fromList` conversions are provided by means of
--- the `Foldable` and `IsList` instances.
-module StrictList where
+module StrictList
+  ( -- * Strict list type
+    StrictList (Cons, Nil),
 
-import StrictList.Prelude hiding (drop, dropWhile, reverse, take, takeWhile)
+    -- * Conversions
+    toListReversed,
+    fromListReversed,
+
+    -- * Basic transformations
+    reverse,
+    take,
+    takeReversed,
+    drop,
+    filter,
+    filterReversed,
+    takeWhile,
+    takeWhileReversed,
+    dropWhile,
+    takeWhileFromEnding,
+    dropWhileFromEnding,
+    span,
+    spanReversed,
+    spanFromEnding,
+    break,
+    breakReversed,
+
+    -- * Queries
+    match,
+    uncons,
+    head,
+    last,
+    tail,
+    init,
+    initReversed,
+
+    -- * Zipping and application
+    apZipping,
+    apZippingReversed,
+
+    -- * Reversed-order helpers
+    prependReversed,
+    mapReversed,
+    apReversed,
+    explodeReversed,
+    joinReversed,
+    mapMaybeReversed,
+    catMaybesReversed,
+  )
+where
+
+import StrictList.Prelude hiding (break, drop, dropWhile, filter, head, init, last, reverse, span, tail, take, takeWhile)
 
 -- |
 -- Strict linked list.
-data List a = Cons !a !(List a) | Nil
+data StrictList a = Cons !a !(StrictList a) | Nil
   deriving
-    (Eq, Ord, Show, Read, Generic, Generic1, Data, Typeable)
+    (Eq, Show, Read, Generic, Generic1, Data)
 
-instance IsList (List a) where
-  type Item (List a) = a
+instance (Ord a) => Ord (StrictList a) where
+  compare Nil Nil = EQ
+  compare Nil _ = LT
+  compare _ Nil = GT
+  compare (Cons leftHead leftTail) (Cons rightHead rightTail) =
+    case compare leftHead rightHead of
+      EQ -> compare leftTail rightTail
+      ordering -> ordering
+
+instance IsList (StrictList a) where
+  type Item (StrictList a) = a
   fromList = reverse . fromListReversed
   toList = foldr (:) []
 
-instance Semigroup (List a) where
+instance Semigroup (StrictList a) where
   (<>) a b = case b of
     Nil -> a
     _ -> prependReversed (reverse a) b
 
-instance Monoid (List a) where
+instance Monoid (StrictList a) where
   mempty = Nil
   mappend = (<>)
 
-instance Functor List where
+instance Functor StrictList where
   fmap f = reverse . mapReversed f
 
-instance Foldable List where
+instance Foldable StrictList where
   foldr step init =
     let loop = \case
           Cons head tail -> step head (loop tail)
@@ -54,47 +108,47 @@ instance Foldable List where
           _ -> acc
      in loop init
 
-instance Traversable List where
+instance Traversable StrictList where
   sequenceA = foldr (liftA2 Cons) (pure Nil)
 
-instance Apply List where
+instance Apply StrictList where
   (<.>) fList aList = apReversed (reverse fList) (reverse aList)
 
-instance Applicative List where
+instance Applicative StrictList where
   pure a = Cons a Nil
   (<*>) = (<.>)
 
-instance Alt List where
+instance Alt StrictList where
   (<!>) = mappend
 
-instance Plus List where
+instance Plus StrictList where
   zero = mempty
 
-instance Alternative List where
+instance Alternative StrictList where
   empty = zero
   (<|>) = (<!>)
 
-instance Bind List where
+instance Bind StrictList where
   (>>-) ma amb = reverse (explodeReversed amb ma)
   join = reverse . joinReversed
 
-instance Monad List where
+instance Monad StrictList where
   return = pure
   (>>=) = (>>-)
 
-instance MonadPlus List where
+instance MonadPlus StrictList where
   mzero = empty
   mplus = (<|>)
 
-instance (Hashable a) => Hashable (List a)
+instance (Hashable a) => Hashable (StrictList a)
 
-instance (NFData a) => NFData (List a)
+instance (NFData a) => NFData (StrictList a)
 
-instance NFData1 List
+instance NFData1 StrictList
 
 -- |
 -- Convert to lazy list in normal form (with all elements and spine evaluated).
-toListReversed :: List a -> [a]
+toListReversed :: StrictList a -> [a]
 toListReversed = go []
   where
     go !outputList = \case
@@ -104,18 +158,18 @@ toListReversed = go []
 -- |
 -- Reverse the list.
 {-# INLINE reverse #-}
-reverse :: List a -> List a
+reverse :: StrictList a -> StrictList a
 reverse = foldl' (flip Cons) Nil
 
 -- |
 -- Leave only the specified amount of elements.
 {-# INLINE take #-}
-take :: Int -> List a -> List a
+take :: Int -> StrictList a -> StrictList a
 take amount = reverse . takeReversed amount
 
 -- |
 -- Leave only the specified amount of elements, in reverse order.
-takeReversed :: Int -> List a -> List a
+takeReversed :: Int -> StrictList a -> StrictList a
 takeReversed =
   let loop !output !amount =
         if amount > 0
@@ -127,7 +181,7 @@ takeReversed =
 
 -- |
 -- Leave only the elements after the specified amount of first elements.
-drop :: Int -> List a -> List a
+drop :: Int -> StrictList a -> StrictList a
 drop amount =
   if amount > 0
     then \case
@@ -138,13 +192,13 @@ drop amount =
 -- |
 -- Leave only the elements satisfying the predicate.
 {-# INLINE filter #-}
-filter :: (a -> Bool) -> List a -> List a
+filter :: (a -> Bool) -> StrictList a -> StrictList a
 filter predicate = reverse . filterReversed predicate
 
 -- |
 -- Leave only the elements satisfying the predicate,
 -- producing a list in reversed order.
-filterReversed :: (a -> Bool) -> List a -> List a
+filterReversed :: (a -> Bool) -> StrictList a -> StrictList a
 filterReversed predicate =
   let loop !newList = \case
         Cons head tail ->
@@ -157,13 +211,13 @@ filterReversed predicate =
 -- |
 -- Leave only the first elements satisfying the predicate.
 {-# INLINE takeWhile #-}
-takeWhile :: (a -> Bool) -> List a -> List a
+takeWhile :: (a -> Bool) -> StrictList a -> StrictList a
 takeWhile predicate = reverse . takeWhileReversed predicate
 
 -- |
 -- Leave only the first elements satisfying the predicate,
 -- producing a list in reversed order.
-takeWhileReversed :: (a -> Bool) -> List a -> List a
+takeWhileReversed :: (a -> Bool) -> StrictList a -> StrictList a
 takeWhileReversed predicate =
   let loop !newList = \case
         Cons head tail ->
@@ -175,7 +229,7 @@ takeWhileReversed predicate =
 
 -- |
 -- Drop the first elements satisfying the predicate.
-dropWhile :: (a -> Bool) -> List a -> List a
+dropWhile :: (a -> Bool) -> StrictList a -> StrictList a
 dropWhile predicate = \case
   Cons head tail ->
     if predicate head
@@ -189,12 +243,12 @@ dropWhile predicate = \case
 --
 -- >span predicate list = (takeWhile predicate list, dropWhile predicate list)
 {-# INLINE span #-}
-span :: (a -> Bool) -> List a -> (List a, List a)
+span :: (a -> Bool) -> StrictList a -> (StrictList a, StrictList a)
 span predicate = first reverse . spanReversed predicate
 
 -- |
 -- Same as `span`, only with the first list in reverse order.
-spanReversed :: (a -> Bool) -> List a -> (List a, List a)
+spanReversed :: (a -> Bool) -> StrictList a -> (StrictList a, StrictList a)
 spanReversed predicate =
   let buildPrefix !prefix = \case
         Cons head tail ->
@@ -209,12 +263,12 @@ spanReversed predicate =
 --
 -- >break predicate = span (not . predicate)
 {-# INLINE break #-}
-break :: (a -> Bool) -> List a -> (List a, List a)
+break :: (a -> Bool) -> StrictList a -> (StrictList a, StrictList a)
 break predicate = first reverse . breakReversed predicate
 
 -- |
 -- Same as `break`, only with the first list in reverse order.
-breakReversed :: (a -> Bool) -> List a -> (List a, List a)
+breakReversed :: (a -> Bool) -> StrictList a -> (StrictList a, StrictList a)
 breakReversed predicate =
   let buildPrefix !prefix = \case
         Cons head tail ->
@@ -231,7 +285,7 @@ breakReversed predicate =
 -- >>> takeWhileFromEnding (> 2) (fromList [1,4,2,3,4,5])
 -- fromList [5,4,3]
 {-# INLINE takeWhileFromEnding #-}
-takeWhileFromEnding :: (a -> Bool) -> List a -> List a
+takeWhileFromEnding :: (a -> Bool) -> StrictList a -> StrictList a
 takeWhileFromEnding predicate =
   foldl'
     ( \newList a ->
@@ -247,7 +301,7 @@ takeWhileFromEnding predicate =
 --
 -- >>> dropWhileFromEnding (> 2) (fromList [1,4,2,3,4,5])
 -- fromList [2,4,1]
-dropWhileFromEnding :: (a -> Bool) -> List a -> List a
+dropWhileFromEnding :: (a -> Bool) -> StrictList a -> StrictList a
 dropWhileFromEnding predicate =
   let loop confirmed unconfirmed = \case
         Cons head tail ->
@@ -261,7 +315,7 @@ dropWhileFromEnding predicate =
 
 -- |
 -- Same as @(`span` predicate . `reverse`)@.
-spanFromEnding :: (a -> Bool) -> List a -> (List a, List a)
+spanFromEnding :: (a -> Bool) -> StrictList a -> (StrictList a, StrictList a)
 spanFromEnding predicate =
   let loop !confirmedPrefix !unconfirmedPrefix !suffix = \case
         Cons head tail ->
@@ -280,7 +334,7 @@ spanFromEnding predicate =
 --
 -- Essentially provides the same functionality as `either` for `Either` and `maybe` for `Maybe`.
 {-# INLINE match #-}
-match :: result -> (element -> List element -> result) -> List element -> result
+match :: result -> (element -> StrictList element -> result) -> StrictList element -> result
 match nil cons = \case
   Cons head tail -> cons head tail
   Nil -> nil
@@ -288,7 +342,7 @@ match nil cons = \case
 -- |
 -- Get the first element and the remainder of the list if it's not empty.
 {-# INLINE uncons #-}
-uncons :: List a -> Maybe (a, List a)
+uncons :: StrictList a -> Maybe (a, StrictList a)
 uncons = \case
   Cons head tail -> Just (head, tail)
   _ -> Nothing
@@ -296,7 +350,7 @@ uncons = \case
 -- |
 -- Get the first element, if list is not empty.
 {-# INLINE head #-}
-head :: List a -> Maybe a
+head :: StrictList a -> Maybe a
 head = \case
   Cons head _ -> Just head
   _ -> Nothing
@@ -304,7 +358,7 @@ head = \case
 -- |
 -- Get the last element, if list is not empty.
 {-# INLINE last #-}
-last :: List a -> Maybe a
+last :: StrictList a -> Maybe a
 last =
   let loop !previous = \case
         Cons head tail -> loop (Just head) tail
@@ -314,7 +368,7 @@ last =
 -- |
 -- Get all elements of the list but the first one.
 {-# INLINE tail #-}
-tail :: List a -> List a
+tail :: StrictList a -> StrictList a
 tail = \case
   Cons _ tail -> tail
   Nil -> Nil
@@ -322,12 +376,12 @@ tail = \case
 -- |
 -- Get all elements but the last one.
 {-# INLINE init #-}
-init :: List a -> List a
+init :: StrictList a -> StrictList a
 init = reverse . initReversed
 
 -- |
 -- Get all elements but the last one, producing the results in reverse order.
-initReversed :: List a -> List a
+initReversed :: StrictList a -> StrictList a
 initReversed =
   let loop !confirmed !unconfirmed = \case
         Cons head tail -> loop unconfirmed (Cons head unconfirmed) tail
@@ -337,13 +391,13 @@ initReversed =
 -- |
 -- Apply the functions in the left list to elements in the right one.
 {-# INLINE apZipping #-}
-apZipping :: List (a -> b) -> List a -> List b
+apZipping :: StrictList (a -> b) -> StrictList a -> StrictList b
 apZipping left right = apZippingReversed (reverse left) (reverse right)
 
 -- |
 -- Apply the functions in the left list to elements in the right one,
 -- producing a list of results in reversed order.
-apZippingReversed :: List (a -> b) -> List a -> List b
+apZippingReversed :: StrictList (a -> b) -> StrictList a -> StrictList b
 apZippingReversed =
   let loop bList = \case
         Cons f fTail -> \case
@@ -359,21 +413,21 @@ apZippingReversed =
 -- |
 -- Construct from a lazy list in reversed order.
 {-# INLINE fromListReversed #-}
-fromListReversed :: [a] -> List a
+fromListReversed :: [a] -> StrictList a
 fromListReversed = foldl' (flip Cons) Nil
 
 -- |
 -- Add elements of the left list in reverse order
 -- in the beginning of the right list.
 {-# INLINE prependReversed #-}
-prependReversed :: List a -> List a -> List a
+prependReversed :: StrictList a -> StrictList a -> StrictList a
 prependReversed = \case
   Cons head tail -> prependReversed tail . Cons head
   Nil -> id
 
 -- |
 -- Map producing a list in reversed order.
-mapReversed :: (a -> b) -> List a -> List b
+mapReversed :: (a -> b) -> StrictList a -> StrictList b
 mapReversed f =
   let loop !newList = \case
         Cons head tail -> loop (Cons (f head) newList) tail
@@ -384,26 +438,26 @@ mapReversed f =
 -- Apply the functions in the left list to every element in the right one,
 -- producing a list of results in reversed order.
 {-# INLINE apReversed #-}
-apReversed :: List (a -> b) -> List a -> List b
+apReversed :: StrictList (a -> b) -> StrictList a -> StrictList b
 apReversed fList aList = foldl' (\z f -> foldl' (\z a -> Cons (f a) z) z aList) Nil fList
 
 -- |
 -- Use a function to produce a list of lists and then concat them sequentially,
 -- producing the results in reversed order.
 {-# INLINE explodeReversed #-}
-explodeReversed :: (a -> List b) -> List a -> List b
+explodeReversed :: (a -> StrictList b) -> StrictList a -> StrictList b
 explodeReversed amb = foldl' (\z -> foldl' (flip Cons) z . amb) Nil
 
 -- |
 -- Join (concat) producing results in reversed order.
 {-# INLINE joinReversed #-}
-joinReversed :: List (List a) -> List a
+joinReversed :: StrictList (StrictList a) -> StrictList a
 joinReversed = foldl' (foldl' (flip Cons)) Nil
 
 -- |
 -- Map and filter elements producing results in reversed order.
 {-# INLINE mapMaybeReversed #-}
-mapMaybeReversed :: (a -> Maybe b) -> List a -> List b
+mapMaybeReversed :: (a -> Maybe b) -> StrictList a -> StrictList b
 mapMaybeReversed f = go Nil
   where
     go !outputList = \case
@@ -414,7 +468,7 @@ mapMaybeReversed f = go Nil
 
 -- |
 -- Keep only the present values, reversing the order.
-catMaybesReversed :: List (Maybe a) -> List a
+catMaybesReversed :: StrictList (Maybe a) -> StrictList a
 catMaybesReversed = go Nil
   where
     go !outputList = \case
