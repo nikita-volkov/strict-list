@@ -62,7 +62,20 @@ module StrictList
   )
 where
 
-import StrictList.Prelude hiding (break, drop, dropWhile, filter, head, init, last, reverse, span, tail, take, takeWhile)
+import Control.Applicative (Alternative (..))
+import Control.Arrow (first)
+import Control.DeepSeq (NFData, NFData1)
+import Control.Monad (MonadPlus (..))
+import Data.Data (Data)
+import Data.Function (id, (.))
+import Data.Functor.Alt (Alt (..))
+import Data.Functor.Apply (Apply ((<.>)))
+import Data.Functor.Bind (Bind (..))
+import Data.Functor.Plus (Plus (..))
+import Data.Hashable (Hashable)
+import GHC.Exts (IsList (..))
+import GHC.Generics (Generic, Generic1)
+import Prelude hiding (break, drop, dropWhile, filter, head, id, init, last, reverse, span, tail, take, takeWhile, (.))
 
 -- |
 -- Strict linked list.

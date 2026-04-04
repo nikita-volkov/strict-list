@@ -41,7 +41,6 @@ library
   import: language-settings
   hs-source-dirs: library
   exposed-modules: StrictList
-  other-modules: StrictList.Prelude
   build-depends:
     base >=4.9 && <5,
     deepseq >=1.4.3 && <2,
