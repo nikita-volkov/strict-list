@@ -99,8 +99,8 @@ main =
           $ \(strict, lazy) ->
             toList (initReversed strict) === Lazy.reverse (Lazy.take (Lazy.length lazy - 1) lazy),
         testProperty "fromListReversed"
-          $ forAll strictAndLazyListGen
-          $ \(strict, lazy) ->
+          $ forAll lazyListGen
+          $ \lazy ->
             toList (fromListReversed lazy) === Lazy.reverse lazy,
         testProperty "prependReversed"
           $ forAll ((,) <$> strictAndLazyListGen <*> strictAndLazyListGen)
