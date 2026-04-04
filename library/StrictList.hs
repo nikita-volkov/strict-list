@@ -62,21 +62,30 @@ module StrictList
   )
 where
 
-import Control.Applicative (Alternative (..))
+import Control.Applicative (Alternative (..), Applicative (..))
 import Control.Arrow (first)
 import Control.DeepSeq (NFData, NFData1)
-import Control.Monad (MonadPlus (..))
+import Control.Monad (Monad (..), MonadPlus (..))
+import Data.Bool (Bool (..))
 import Data.Data (Data)
-import Data.Function (id, (.))
+import Data.Foldable (Foldable (foldl', foldr))
+import Data.Function (const, flip, id, (.))
+import Data.Functor (Functor (..), (<$>))
 import Data.Functor.Alt (Alt (..))
 import Data.Functor.Apply (Apply ((<.>)))
 import Data.Functor.Bind (Bind (..))
 import Data.Functor.Plus (Plus (..))
 import Data.Hashable (Hashable)
+import Data.Int (Int)
+import Data.Maybe (Maybe (..))
+import Data.Monoid (Monoid (..))
+import Data.Ord (Ord (..), Ordering (..))
+import Data.Semigroup (Semigroup (..))
+import Data.Traversable (Traversable (sequenceA))
 import GHC.Exts (IsList (..))
 import GHC.Generics (Generic, Generic1)
 import qualified Test.QuickCheck as Qc
-import Prelude hiding (break, drop, dropWhile, filter, head, id, init, last, reverse, span, tail, take, takeWhile, (.))
+import Prelude (Eq (..), Read, Show, pred)
 
 -- |
 -- Strict linked list.
@@ -162,11 +171,11 @@ instance NFData1 StrictList
 
 instance (Qc.Arbitrary a) => Qc.Arbitrary (StrictList a) where
   arbitrary = fromList <$> Qc.arbitrary
-  shrink = map fromList . Qc.shrink . toList
+  shrink = fmap fromList . Qc.shrink . toList
 
 instance Qc.Arbitrary1 StrictList where
   liftArbitrary elemGen = fromList <$> Qc.liftArbitrary elemGen
-  liftShrink elemShrink = map fromList . Qc.liftShrink elemShrink . toList
+  liftShrink elemShrink = fmap fromList . Qc.liftShrink elemShrink . toList
 
 -- |
 -- Convert to lazy list in normal form (with all elements and spine evaluated).
