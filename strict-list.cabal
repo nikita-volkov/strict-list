@@ -1,9 +1,9 @@
 cabal-version: 3.0
 name: strict-list
 version: 1.0.0.0
-synopsis: Strict linked list
+synopsis: Strict linked list with stack-safe operations
 description:
-  Implementation of strict linked list with care taken about stack.
+  A strict linked list with stack-safe operations and reversed-order helpers.
 
 category: Data
 homepage: https://github.com/nikita-volkov/strict-list
@@ -13,7 +13,9 @@ maintainer: Nikita Volkov <nikita.y.volkov@mail.ru>
 copyright: (c) 2019, Nikita Volkov
 license: MIT
 license-file: LICENSE
-extra-doc-files: CHANGELOG.md
+extra-doc-files:
+  CHANGELOG.md
+  README.md
 
 source-repository head
   type: git
