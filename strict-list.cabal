@@ -44,6 +44,7 @@ library
   hs-source-dirs: library
   exposed-modules: StrictList
   build-depends:
+    QuickCheck >=2.14 && <3,
     base >=4.9 && <5,
     deepseq >=1.4.3 && <2,
     hashable >=1.2 && <2,

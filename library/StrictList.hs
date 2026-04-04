@@ -75,6 +75,7 @@ import Data.Functor.Plus (Plus (..))
 import Data.Hashable (Hashable)
 import GHC.Exts (IsList (..))
 import GHC.Generics (Generic, Generic1)
+import qualified Test.QuickCheck as Qc
 import Prelude hiding (break, drop, dropWhile, filter, head, id, init, last, reverse, span, tail, take, takeWhile, (.))
 
 -- |
@@ -158,6 +159,14 @@ instance (Hashable a) => Hashable (StrictList a)
 instance (NFData a) => NFData (StrictList a)
 
 instance NFData1 StrictList
+
+instance (Qc.Arbitrary a) => Qc.Arbitrary (StrictList a) where
+  arbitrary = fromList <$> Qc.arbitrary
+  shrink = map fromList . Qc.shrink . toList
+
+instance Qc.Arbitrary1 StrictList where
+  liftArbitrary elemGen = fromList <$> Qc.liftArbitrary elemGen
+  liftShrink elemShrink = map fromList . Qc.liftShrink elemShrink . toList
 
 -- |
 -- Convert to lazy list in normal form (with all elements and spine evaluated).

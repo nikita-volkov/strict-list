@@ -187,10 +187,6 @@ main =
       length <- choose (0, maxSize)
       replicateM length (arbitrary @Word8)
 
-instance (Arbitrary a) => Arbitrary (StrictList a) where
-  arbitrary = fromList <$> arbitrary
-  shrink = map fromList . shrink . toList
-
 -- Workarounds to satisfy QuickCheck's requirements,
 -- when we need to generate a predicate.
 
