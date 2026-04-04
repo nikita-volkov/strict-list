@@ -17,7 +17,9 @@ module StrictList
     StrictList (Cons, Nil),
 
     -- * Conversions
+    toList,
     toListReversed,
+    fromList,
     fromListReversed,
 
     -- * Basic transformations
@@ -82,7 +84,7 @@ import Data.Monoid (Monoid (..))
 import Data.Ord (Ord (..), Ordering (..))
 import Data.Semigroup (Semigroup (..))
 import Data.Traversable (Traversable (sequenceA))
-import GHC.Exts (IsList (..))
+import qualified GHC.Exts
 import GHC.Generics (Generic, Generic1)
 import qualified Test.QuickCheck as Qc
 import Prelude (Eq (..), Read, Show, pred)
@@ -102,10 +104,10 @@ instance (Ord a) => Ord (StrictList a) where
       EQ -> compare leftTail rightTail
       ordering -> ordering
 
-instance IsList (StrictList a) where
+instance GHC.Exts.IsList (StrictList a) where
   type Item (StrictList a) = a
-  fromList = reverse . fromListReversed
-  toList = foldr (:) []
+  fromList = fromList
+  toList = toList
 
 instance Semigroup (StrictList a) where
   (<>) a b = case b of
@@ -178,6 +180,11 @@ instance Qc.Arbitrary1 StrictList where
   liftShrink elemShrink = fmap fromList . Qc.liftShrink elemShrink . toList
 
 -- |
+-- Convert to lazy list.
+toList :: StrictList a -> [a]
+toList = foldr (:) []
+
+-- |
 -- Convert to lazy list in normal form (with all elements and spine evaluated).
 toListReversed :: StrictList a -> [a]
 toListReversed = go []
@@ -185,6 +192,11 @@ toListReversed = go []
     go !outputList = \case
       Cons element list -> go (element : outputList) list
       Nil -> outputList
+
+-- |
+-- Construct from a lazy list.
+fromList :: [a] -> StrictList a
+fromList = reverse . fromListReversed
 
 -- |
 -- Reverse the list.

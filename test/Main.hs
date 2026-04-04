@@ -4,11 +4,10 @@ module Main where
 
 import qualified Data.List as Lazy
 import qualified Data.Maybe as Maybe
-import GHC.Exts as Exports (IsList (..))
 import StrictList
 import Test.Tasty
 import Test.Tasty.QuickCheck
-import Prelude hiding (List, break, choose, drop, dropWhile, filter, head, init, last, reverse, span, tail, take, takeWhile, toList)
+import Prelude hiding (break, choose, drop, dropWhile, filter, fromList, head, init, last, reverse, span, tail, take, takeWhile, toList)
 
 main :: IO ()
 main =
@@ -21,7 +20,7 @@ main =
         testProperty "fromList"
           $ forAll lazyListGen
           $ \lazy ->
-            toList (fromList @(StrictList Word8) lazy) === lazy,
+            toList (fromList lazy) === lazy,
         testProperty "compare"
           $ forAll ((,) <$> strictAndLazyListGen <*> strictAndLazyListGen)
           $ \((strict1, lazy1), (strict2, lazy2)) ->
