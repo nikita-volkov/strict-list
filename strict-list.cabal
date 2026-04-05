@@ -21,7 +21,7 @@ source-repository head
   type: git
   location: https://github.com/nikita-volkov/strict-list
 
-common language-settings
+common base
   default-language: Haskell2010
   default-extensions:
     BangPatterns
@@ -33,14 +33,30 @@ common language-settings
     FlexibleInstances
     LambdaCase
     NoImplicitPrelude
+    NumericUnderscores
     RankNTypes
     ScopedTypeVariables
     StandaloneDeriving
     TypeApplications
     TypeFamilies
 
+common executable
+  import: base
+  ghc-options:
+    -O2
+    -threaded
+    -with-rtsopts=-N
+    -rtsopts
+    -funbox-strict-fields
+
+common test
+  import: base
+  ghc-options:
+    -threaded
+    -with-rtsopts=-N
+
 library
-  import: language-settings
+  import: base
   hs-source-dirs: library
   exposed-modules: StrictList
   build-depends:
@@ -51,24 +67,9 @@ library
     semigroupoids >=5.3 && <7,
 
 test-suite test
+  import: test
   type: exitcode-stdio-1.0
   hs-source-dirs: test
-  default-extensions:
-    BangPatterns
-    DeriveDataTypeable
-    DeriveFunctor
-    DeriveGeneric
-    DeriveTraversable
-    FlexibleContexts
-    FlexibleInstances
-    LambdaCase
-    NoImplicitPrelude
-    RankNTypes
-    ScopedTypeVariables
-    StandaloneDeriving
-    TypeApplications
-    TypeFamilies
-
   default-language: Haskell2010
   main-is: Main.hs
   build-depends:
@@ -77,8 +78,9 @@ test-suite test
     tasty >=1.5.4 && <1.6,
     tasty-quickcheck >=0.11.1 && <0.12,
 
-executable bench-list
-  import: language-settings
+benchmark bench-list
+  import: base
+  type: exitcode-stdio-1.0
   hs-source-dirs: bench
   main-is: Main.hs
   build-depends:

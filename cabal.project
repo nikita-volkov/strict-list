@@ -3,3 +3,5 @@ allow-newer:
   *:base,
   *:ghc,
   *:template-haskell,
+tests: True
+benchmarks: True
