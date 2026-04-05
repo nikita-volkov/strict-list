@@ -79,7 +79,7 @@ test-suite test
     tasty-quickcheck >=0.11.1 && <0.12,
 
 benchmark bench-list
-  import: base
+  import: executable
   type: exitcode-stdio-1.0
   hs-source-dirs: bench
   main-is: Main.hs
