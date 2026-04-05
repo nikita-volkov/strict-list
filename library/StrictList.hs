@@ -61,9 +61,8 @@ module StrictList
     joinReversed,
     mapMaybeReversed,
     catMaybesReversed,
-
     map,
-    mapStack
+    mapStack,
   )
 where
 
@@ -94,14 +93,16 @@ import Prelude (Eq (..), Read, Show, pred, ($!))
 
 -- Functions to benchmark
 {-# OPAQUE map #-}
+
 {-# OPAQUE mapStack #-}
+
 map :: (a -> b) -> StrictList a -> StrictList b
 map f xs = fmap f xs
+
 mapStack :: (a -> b) -> StrictList a -> StrictList b
 mapStack f = \case
   Nil -> Nil
   Cons x xs -> Cons (f x) $! mapStack f xs
-
 
 -- |
 -- Strict linked list.
