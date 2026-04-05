@@ -76,3 +76,12 @@ test-suite test
     strict-list,
     tasty >=1.5.4 && <1.6,
     tasty-quickcheck >=0.11.1 && <0.12,
+
+executable bench-list
+  import: language-settings
+  hs-source-dirs: bench
+  main-is: Main.hs
+  build-depends:
+    base >=4.13 && <5,
+    criterion >=1.5 && <2,
+    strict-list,
