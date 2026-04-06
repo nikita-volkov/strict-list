@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: strict-list
-version: 1.0.0.0
+version: 1.0.0.1
 synopsis: Strict linked list with stack-safe operations
 description:
   A strict linked list with stack-safe operations and reversed-order helpers.
