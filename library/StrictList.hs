@@ -2,8 +2,8 @@
 -- Definitions of strict linked list.
 --
 -- Most basic operations like `fmap`, `filter`, `<*>`
--- can only be implemented efficiently by producing an intermediate list in reversed order
--- and then reversing it to the original order.
+-- are implemented efficiently by producing an intermediate list in reversed order
+-- and then reversing it to the original order to avoid stack recursion.
 -- These intermediate reversed functions are exposed by the API,
 -- because they very well may be useful for efficient implementations of data-structures built on top of list.
 -- E.g., the <http://hackage.haskell.org/package/deque "deque"> package exploits them heavily.
